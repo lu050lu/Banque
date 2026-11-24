@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devolut</title>
+
+  <style>
+    :root {
+      --bg: #f4f6fa;
+      --card: #ffffff;
+      --text: #151821;
+      --muted: #737987;
+      --border: #e5e8ef;
+      --accent: #635bff;
+      --accent-light: #eeedff;
+      --danger: #e53935;
+      --success: #178653;
+      --shadow: 0 12px 35px rgba(22, 28, 45, 0.08);
+    }
+
+    body.dark {
+      --bg: #101116;
+      --card: #1b1d25;
+      --text: #f5f6fa;
+      --muted: #a1a5b2;
+      --border: #30323d;
+      --accent: #918aff;
+      --accent-light: #302d50;
+      --danger: #ff5b57;
+      --success: #53c995;
+      --shadow: 0 12px 35px rgba(0, 0, 0, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Connexion */
+
+    #loginScreen {
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(99, 91, 255, 0.16), transparent 35%),
+        var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 32px 26px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .brand {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+    }
+
+    .brand span,
+    .header-brand span {
+      color: var(--accent);
+    }
+
+    .prototype-label {
+      display: inline-block;
+      margin: 0 0 24px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .login-card h1 {
+      margin: 0 0 8px;
+      font-size: 23px;
+    }
+
+    .login-card p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .primary-button {
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .primary-button:active {
+      transform: scale(0.98);
+    }
+
+    .primary-button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .login-note {
+      margin-top: 18px !important;
+      margin-bottom: 0 !important;
+      font-size: 12px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Accueil et écrans principaux */
+
+    #appScreen,
+    #monAccountScreen,
+    #settingsScreen,
+    #documentsScreen,
+    #accountScreen {
+      flex-direction: column;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 20px 16px;
+    }
+
+    .header-brand {
+      margin: 0;
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .settings-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    .app-content {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px 30px;
+    }
+
+    .balance-card {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #635bff, #443bd1);
+      color: white;
+      box-shadow: 0 14px 30px rgba(99, 91, 255, 0.2);
+    }
+
+    .balance-card::after {
+      position: absolute;
+      right: -35px;
+      bottom: -75px;
+      width: 190px;
+      height: 190px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .balance-label {
+      margin: 0 0 8px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    .balance-amount {
+      margin: 0 0 20px;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+    }
+
+    .account-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ffd166;
+    }
+
+    .section-heading {
+      margin: 25px 0 13px;
+      font-size: 18px;
+      font-weight: 750;
+    }
+
+    .menu-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--card);
+      color: var(--text);
+      text-align: left;
+    }
+
+    .menu-item:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .menu-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .menu-copy {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .menu-title {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .menu-subtitle {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .menu-arrow {
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    /* Barre d’onglets */
+
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      justify-content: space-around;
+      gap: 6px;
+      margin-top: auto;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .nav-item {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 6px 4px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      transition: color 180ms ease, background-color 180ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-item span:first-child {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .nav-item.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .nav-item:active:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    .nav-item:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* En-têtes et contenus des pages */
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 20px;
+    }
+
+    .back-button {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .page-content {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px 30px;
+    }
+
+    .settings-card,
+    .empty-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+    }
+
+    .settings-card + .settings-card {
+      margin-top: 14px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .setting-row + .setting-row {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .setting-title {
+      margin: 0 0 5px;
+      font-weight: 700;
+    }
+
+    .setting-description {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .theme-toggle {
+      width: 48px;
+      height: 28px;
+      padding: 3px;
+      border: 0;
+      border-radius: 999px;
+      background: #c8cbd4;
+    }
+
+    .theme-toggle::before {
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      content: "";
+      transition: transform 0.2s;
+    }
+
+    body.dark .theme-toggle {
+      background: var(--accent);
+    }
+
+    body.dark .theme-toggle::before {
+      transform: translateX(20px);
+    }
+
+    .language-select {
+      max-width: 145px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .version {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .logout-button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px;
+      border: 1px solid var(--danger);
+      border-radius: 14px;
+      background: var(--danger);
+      color: white;
+      font-weight: 750;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .logout-button:active {
+      opacity: 0.8;
+      transform: scale(0.99);
+    }
+
+    .empty-card {
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      margin-bottom: 12px;
+      font-size: 34px;
+    }
+
+    .empty-card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .empty-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Compte */
+
+    .account-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .account-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .account-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .account-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .account-name {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .account-description {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .account-amount {
+      flex: 0 0 auto;
+      font-size: 16px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .account-note {
+      margin: 16px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Bouton d’ouverture et formulaire de virement */
+
+    .transfer-open-button {
+      width: 100%;
+      min-height: 50px;
+      margin-top: 18px;
+      padding: 13px 16px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .transfer-card {
+      margin-top: 14px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .transfer-card[hidden] {
+      display: none;
+    }
+
+    .transfer-card h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .transfer-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .transfer-field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .transfer-field label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .transfer-field select,
+    .transfer-field input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .transfer-field select:focus,
+    .transfer-field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.12);
+    }
+
+    .transfer-submit {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 13px;
+      background: var(--accent);
+      color: white;
+      font-weight: 750;
+    }
+
+    .transfer-message {
+      display: none;
+      margin: 14px 0 0;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .transfer-message.success {
+      display: block;
+      background: rgba(23, 134, 83, 0.1);
+      color: var(--success);
+    }
+
+    .transfer-message.error {
+      display: block;
+      background: rgba(229, 57, 53, 0.1);
+      color: var(--danger);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.35s forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .account-card {
+        align-items: flex-start;
+        padding: 14px;
+      }
+
+      .account-details {
+        gap: 9px;
+      }
+
+      .account-amount {
+        max-width: 105px;
+        overflow-wrap: anywhere;
+        font-size: 14px;
+      }
+
+      .nav-item {
+        font-size: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .app-header,
+      .page-header {
+        padding-left: max(20px, calc((100% - 560px) / 2));
+        padding-right: max(20px, calc((100% - 560px) / 2));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Connexion : l'avertissement de prototype apparaît uniquement ici -->
+  <section id="loginScreen" class="screen active">
+    <div class="login-card">
+      <div class="brand">devo<span>lut</span></div>
+      <div class="prototype-label" data-i18n="prototype">PROTOTYPE</div>
+
+      <h1 data-i18n="welcome">Bienvenue</h1>
+      <p data-i18n="loginDescription">
+        Connectez-vous pour accéder à votre espace de démonstration.
+      </p>
+
+      <button id="loginButton" class="primary-button" onclick="login()" data-i18n="login">
+        Se connecter
+      </button>
+
+      <p class="login-note" data-i18n="loginNote">
+        Prototype indépendant. Aucun compte bancaire réel n’est connecté.
+      </p>
+    </div>
+  </section>
+
+  <!-- Accueil -->
+  <section id="appScreen" class="screen">
+    <header class="app-header">
+      <div class="header-brand">devo<span>lut</span></div>
+      <button class="settings-icon" onclick="showScreen('monAccountScreen')" aria-label="Mon compte" data-i18n-aria-label="myAccount">
+        ♙
+      </button>
+    </header>
+
+    <main class="app-content">
+      <div class="balance-card">
+        <p class="balance-label" data-i18n="balance">Solde disponible</p>
+        <p class="balance-amount" id="homeBalance">2 450,00 €</p>
+        <div class="account-status">
+          <span class="status-dot"></span>
+          <span data-i18n="blocked">Compte bloqué</span>
+        </div>
+      </div>
+
+      <h2 class="section-heading" data-i18n="yourSpace">Votre espace</h2>
+
+      <div class="menu-list">
+        <button class="menu-item" disabled>
+          <span class="menu-icon">↗</span>
+          <span class="menu-copy">
+            <span class="menu-title" data-i18n="transfer">Faire un virement</span>
+            <span class="menu-subtitle" data-i18n="unavailable">Indisponible</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </button>
+
+        <button class="menu-item" onclick="showScreen('documentsScreen')">
+          <span class="menu-icon">▤</span>
+          <span class="menu-copy">
+            <span class="menu-title" data-i18n="documents">Mes documents</span>
+            <span class="menu-subtitle" data-i18n="documentsDescription">Consulter vos documents</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </button>
+      </div>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item active" data-tab="appScreen" onclick="showScreen('appScreen')" aria-current="page">
+        <span>⌂</span>
+        <span data-i18n="home">Accueil</span>
+      </button>
+      <button class="nav-item" data-tab="accountScreen" onclick="showScreen('accountScreen')">
+        <span>▣</span>
+        <span data-i18n="accounts">Mes comptes</span>
+      </button>
+      <button class="nav-item" disabled aria-disabled="true">
+        <span>↗</span>
+        <span data-i18n="transferShort">Virement</span>
+      </button>
+      <button class="nav-item" data-tab="documentsScreen" onclick="showScreen('documentsScreen')">
+        <span>▤</span>
+        <span data-i18n="documentsShort">Documents</span>
+      </button>
+    </nav>
+  </section>
+
+  <!-- Mon compte -->
+  <section id="monAccountScreen" class="screen">
+    <header class="page-header">
+      <button class="back-button" onclick="showScreen('appScreen')" aria-label="Retour">‹</button>
+      <h1 data-i18n="myAccount">Mon compte</h1>
+    </header>
+
+    <main class="page-content">
+      <div class="empty-card">
+        <div class="empty-icon">♙</div>
+        <h2 data-i18n="comingSoon">Bientôt disponible</h2>
+        <p data-i18n="myAccountDescription">
+          Les informations de votre compte seront bientôt disponibles ici.
+        </p>
+      </div>
+
+      <button class="transfer-open-button" type="button" onclick="openSettings()">
+        <span data-i18n="settings">Paramètres</span>
+      </button>
+    </main>
+  </section>
+
+  <!-- Mes comptes -->
+  <section id="accountScreen" class="screen">
+    <header class="page-header">
+      <button class="back-button" onclick="showScreen('appScreen')" aria-label="Retour">‹</button>
+      <h1 data-i18n="accounts">Mes comptes</h1>
+    </header>
+
+    <main class="page-content">
+      <div class="account-list">
+        <article class="account-card">
+          <div class="account-details">
+            <div class="account-icon">▤</div>
+            <div>
+              <h2 class="account-name" data-i18n="currentAccount">Compte courant</h2>
+              <p class="account-description" data-i18n="currentAccountDescription">Compte principal</p>
+            </div>
+          </div>
+          <div class="account-amount" id="balance-current">2 450,00 €</div>
+        </article>
+
+        <article class="account-card">
+          <div class="account-details">
+            <div class="account-icon">🌱</div>
+            <div>
+              <h2 class="account-name" data-i18n="livretJeune">Livret Jeune</h2>
+              <p class="account-description" data-i18n="savingsDescription">Épargne</p>
+            </div>
+          </div>
+          <div class="account-amount" id="balance-jeune">1 250,00 €</div>
+        </article>
+
+        <article class="account-card">
+          <div class="account-details">
+            <div class="account-icon">🌿</div>
+            <div>
+              <h2 class="account-name" data-i18n="livretA">Livret A</h2>
+              <p class="account-description" data-i18n="savingsDescription">Épargne</p>
+            </div>
+          </div>
+          <div class="account-amount" id="balance-livretA">5 000,00 €</div>
+        </article>
+      </div>
+
+      <button
+        id="transferToggleButton"
+        class="transfer-open-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="internalTransferPanel"
+        onclick="toggleInternalTransferForm()"
+        data-i18n="openInternalTransfer">
+        Virement entre mes comptes
+      </button>
+
+      <section id="internalTransferPanel" class="transfer-card" hidden aria-labelledby="transferTitle">
+        <h2 id="transferTitle" data-i18n="internalTransfer">Virement entre mes comptes</h2>
+        <p class="transfer-intro" data-i18n="internalTransferDescription">
+          Déplacez de l’argent entre vos comptes Devolut. Les soldes sont fictifs et restent dans cette maquette.
+        </p>
+
+        <form id="internalTransferForm" onsubmit="makeInternalTransfer(event)">
+          <div class="transfer-field">
+            <label for="transferSource" data-i18n="sourceAccount">Compte à débiter</label>
+            <select id="transferSource" required>
+              <option value="current" data-i18n="currentAccount">Compte courant</option>
+              <option value="jeune" data-i18n="livretJeune">Livret Jeune</option>
+              <option value="livretA" data-i18n="livretA">Livret A</option>
+            </select>
+          </div>
+
+          <div class="transfer-field">
+            <label for="transferDestination" data-i18n="destinationAccount">Compte à créditer</label>
+            <select id="transferDestination" required>
+              <option value="livretA" data-i18n="livretA">Livret A</option>
+              <option value="current" data-i18n="currentAccount">Compte courant</option>
+              <option value="jeune" data-i18n="livretJeune">Livret Jeune</option>
+            </select>
+          </div>
+
+          <div class="transfer-field">
+            <label for="transferAmount" data-i18n="transferAmount">Montant (€)</label>
+            <input
+              id="transferAmount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              placeholder="Ex. : 150,00"
+              required>
+          </div>
+
+          <button class="transfer-submit" type="submit" data-i18n="confirmTransfer">
+            Confirmer le virement
+          </button>
+          <p id="transferMessage" class="transfer-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <p class="account-note" data-i18n="accountDemoNote">
+        Les soldes affichés sont fictifs et servent uniquement à la maquette.
+      </p>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item" data-tab="appScreen" onclick="showScreen('appScreen')">
+        <span>⌂</span>
+        <span data-i18n="home">Accueil</span>
+      </button>
+      <button class="nav-item active" data-tab="accountScreen" onclick="showScreen('accountScreen')" aria-current="page">
+        <span>▣</span>
+        <span data-i18n="accounts">Mes comptes</span>
+      </button>
+      <button class="nav-item" disabled aria-disabled="true">
+        <span>↗</span>
+        <span data-i18n="transferShort">Virement</span>
+      </button>
+      <button class="nav-item" data-tab="documentsScreen" onclick="showScreen('documentsScreen')">
+        <span>▤</span>
+        <span data-i18n="documentsShort">Documents</span>
+      </button>
+    </nav>
+  </section>
+
+  <!-- Paramètres -->
+  <section id="settingsScreen" class="screen">
+    <header class="page-header">
+      <button class="back-button" onclick="showScreen(settingsReturnScreen)" aria-label="Retour">‹</button>
+      <h1 data-i18n="settings">Paramètres</h1>
+    </header>
+
+    <main class="page-content">
+      <div class="settings-card">
+        <div class="setting-row">
+          <div>
+            <p class="setting-title" data-i18n="darkMode">Mode sombre</p>
+            <p class="setting-description" data-i18n="darkDescription">
+              Modifier l’apparence de l’application
+            </p>
+          </div>
+          <button
+            id="themeToggle"
+            class="theme-toggle"
+            onclick="toggleTheme()"
+            aria-label="Activer ou désactiver le mode sombre">
+          </button>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <p class="setting-title" data-i18n="version">Version</p>
+            <p class="setting-description" data-i18n="versionDescription">
+              Version de démonstration
+            </p>
+          </div>
+          <span class="version">0.12</span>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="setting-row">
+          <div>
+            <p class="setting-title" data-i18n="language">Langue</p>
+            <p class="setting-description" data-i18n="languageDescription">
+              Choisir la langue de l’application
+            </p>
+          </div>
+
+          <select id="languageSelect" class="language-select" onchange="changeLanguage()">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="logout-button" onclick="logout()" data-i18n="logout">
+        Se déconnecter
+      </button>
+    </main>
+  </section>
+
+  <!-- Documents -->
+  <section id="documentsScreen" class="screen">
+    <header class="page-header">
+      <button class="back-button" onclick="showScreen('appScreen')" aria-label="Retour">‹</button>
+      <h1 data-i18n="documents">Mes documents</h1>
+    </header>
+
+    <main class="page-content">
+      <div class="empty-card">
+        <div class="empty-icon">▤</div>
+        <h2 data-i18n="noDocuments">Aucun document</h2>
+        <p data-i18n="noDocumentsDescription">
+          Il n’y a aucun document à afficher.
+        </p>
+      </div>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item" data-tab="appScreen" onclick="showScreen('appScreen')">
+        <span>⌂</span>
+        <span data-i18n="home">Accueil</span>
+      </button>
+      <button class="nav-item" data-tab="accountScreen" onclick="showScreen('accountScreen')">
+        <span>▣</span>
+        <span data-i18n="accounts">Mes comptes</span>
+      </button>
+      <button class="nav-item" disabled aria-disabled="true">
+        <span>↗</span>
+        <span data-i18n="transferShort">Virement</span>
+      </button>
+      <button class="nav-item active" data-tab="documentsScreen" onclick="showScreen('documentsScreen')" aria-current="page">
+        <span>▤</span>
+        <span data-i18n="documentsShort">Documents</span>
+      </button>
+    </nav>
+  </section>
+
+  <script>
+    const translations = {
+      fr: {
+        prototype: "PROTOTYPE",
+        welcome: "Bienvenue",
+        loginDescription: "Connectez-vous pour accéder à votre espace de démonstration.",
+        login: "Se connecter",
+        loginNote: "Prototype indépendant. Aucun compte bancaire réel n’est connecté.",
+        balance: "Solde disponible",
+        blocked: "Compte bloqué",
+        yourSpace: "Votre espace",
+        home: "Accueil",
+        homeDescription: "Consulter votre espace",
+        transfer: "Faire un virement",
+        transferShort: "Virement",
+        unavailable: "Indisponible",
+        documents: "Mes documents",
+        documentsShort: "Documents",
+        documentsDescription: "Consulter vos documents",
+        account: "Compte",
+        accounts: "Mes comptes",
+        myAccount: "Mon compte",
+        comingSoon: "Bientôt disponible",
+        myAccountDescription: "Les informations de votre compte seront bientôt disponibles ici.",
+        currentAccount: "Compte courant",
+        currentAccountDescription: "Compte principal",
+        livretJeune: "Livret Jeune",
+        livretA: "Livret A",
+        savingsDescription: "Épargne",
+        accountDemoNote: "Les soldes affichés sont fictifs et servent uniquement à la maquette.",
+        openInternalTransfer: "Virement entre mes comptes",
+        closeInternalTransfer: "Masquer le formulaire",
+        internalTransfer: "Virement entre mes comptes",
+        internalTransferDescription: "Déplacez de l’argent entre vos comptes Devolut. Les soldes sont fictifs et restent dans cette maquette.",
+        sourceAccount: "Compte à débiter",
+        destinationAccount: "Compte à créditer",
+        transferAmount: "Montant (€)",
+        confirmTransfer: "Confirmer le virement",
+        transferSuccess: "Virement de {amount} effectué de {source} vers {destination}.",
+        transferSameAccount: "Choisissez deux comptes différents.",
+        transferInvalidAmount: "Saisissez un montant supérieur à zéro.",
+        transferInsufficientFunds: "Le solde de ce compte est insuffisant.",
+        settings: "Paramètres",
+        darkMode: "Mode sombre",
+        darkDescription: "Modifier l’apparence de l’application",
+        version: "Version",
+        versionDescription: "Version de démonstration",
+        language: "Langue",
+        languageDescription: "Choisir la langue de l’application",
+        logout: "Se déconnecter",
+        noDocuments: "Aucun document",
+        noDocumentsDescription: "Il n’y a aucun document à afficher."
+      },
+      en: {
+        prototype: "PROTOTYPE",
+        welcome: "Welcome",
+        loginDescription: "Log in to access your demo account.",
+        login: "Log in",
+        loginNote: "Independent prototype. No real bank account is connected.",
+        balance: "Available balance",
+        blocked: "Account blocked",
+        yourSpace: "Your account",
+        home: "Home",
+        homeDescription: "View your account",
+        transfer: "Make a transfer",
+        transferShort: "Transfer",
+        unavailable: "Unavailable",
+        documents: "My documents",
+        documentsShort: "Documents",
+        documentsDescription: "View your documents",
+        account: "Account",
+        accounts: "My accounts",
+        myAccount: "My account",
+        comingSoon: "Coming soon",
+        myAccountDescription: "Your account information will be available here soon.",
+        currentAccount: "Current account",
+        currentAccountDescription: "Main account",
+        livretJeune: "Livret Jeune",
+        livretA: "Livret A",
+        savingsDescription: "Savings",
+        accountDemoNote: "The balances shown are fictional and are only used in this mockup.",
+        openInternalTransfer: "Transfer between my accounts",
+        closeInternalTransfer: "Hide the form",
+        internalTransfer: "Transfer between my accounts",
+        internalTransferDescription: "Move money between your Devolut accounts. Balances are fictional and only change in this mockup.",
+        sourceAccount: "From account",
+        destinationAccount: "To account",
+        transferAmount: "Amount (€)",
+        confirmTransfer: "Confirm transfer",
+        transferSuccess: "Transfer of {amount} completed from {source} to {destination}.",
+        transferSameAccount: "Choose two different accounts.",
+        transferInvalidAmount: "Enter an amount greater than zero.",
+        transferInsufficientFunds: "This account has insufficient funds.",
+        settings: "Settings",
+        darkMode: "Dark mode",
+        darkDescription: "Change the app appearance",
+        version: "Version",
+        versionDescription: "Demo version",
+        language: "Language",
+        languageDescription: "Choose the app language",
+        logout: "Log out",
+        noDocuments: "No documents",
+        noDocumentsDescription: "There are no documents to display."
+      }
+    };
+
+    const accountNames = {
+      current: { fr: "Compte courant", en: "Current account" },
+      jeune: { fr: "Livret Jeune", en: "Livret Jeune" },
+      livretA: { fr: "Livret A", en: "Livret A" }
+    };
+
+    const balances = {
+      current: 245000,
+      jeune: 125000,
+      livretA: 500000
+    };
+
+    const screenIds = [
+      "loginScreen",
+      "appScreen",
+      "monAccountScreen",
+      "accountScreen",
+      "settingsScreen",
+      "documentsScreen"
+    ];
+
+    let settingsReturnScreen = "monAccountScreen";
+
+    function formatMoney(cents) {
+      return new Intl.NumberFormat(
+        document.documentElement.lang === "en" ? "en-IE" : "fr-FR",
+        { style: "currency", currency: "EUR" }
+      ).format(cents / 100);
+    }
+
+    function updateBalances() {
+      document.getElementById("balance-current").textContent = formatMoney(balances.current);
+      document.getElementById("balance-jeune").textContent = formatMoney(balances.jeune);
+      document.getElementById("balance-livretA").textContent = formatMoney(balances.livretA);
+      document.getElementById("homeBalance").textContent = formatMoney(balances.current);
+    }
+
+    function updateActiveTab(screenId) {
+      document.querySelectorAll(".nav-item[data-tab]").forEach((button) => {
+        const isActive = button.dataset.tab === screenId;
+        button.classList.toggle("active", isActive);
+
+        if (isActive) {
+          button.setAttribute("aria-current", "page");
+        } else {
+          button.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    function showScreen(screenId) {
+      screenIds.forEach((id) => {
+        document.getElementById(id).classList.remove("active", "fade-in");
+      });
+
+      document.getElementById(screenId).classList.add("active", "fade-in");
+      updateActiveTab(screenId);
+    }
+
+    function openSettings() {
+      settingsReturnScreen = "monAccountScreen";
+      showScreen("settingsScreen");
+    }
+
+    function toggleInternalTransferForm() {
+      const panel = document.getElementById("internalTransferPanel");
+      const button = document.getElementById("transferToggleButton");
+      const isOpening = panel.hidden;
+
+      panel.hidden = !isOpening;
+      button.setAttribute("aria-expanded", String(isOpening));
+
+      const language = document.documentElement.lang === "en" ? "en" : "fr";
+      button.textContent = isOpening
+        ? translations[language].closeInternalTransfer
+        : translations[language].openInternalTransfer;
+    }
+
+    function login() {
+      const button = document.getElementById("loginButton");
+
+      if (button.disabled) return;
+
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner" aria-label="Loading"></span>';
+
+      setTimeout(() => {
+        showScreen("appScreen");
+        button.disabled = false;
+        applyLanguage(localStorage.getItem("devolut-language") || "fr");
+      }, 800);
+    }
+
+    function logout() {
+      showScreen("loginScreen");
+    }
+
+    function changeLanguage() {
+      const language = document.getElementById("languageSelect").value;
+      localStorage.setItem("devolut-language", language);
+      applyLanguage(language);
+      updateBalances();
+    }
+
+    function applyLanguage(language) {
+      const selectedLanguage = translations[language] ? language : "fr";
+      const text = translations[selectedLanguage];
+
+      document.documentElement.lang = selectedLanguage;
+
+      document.querySelectorAll("[data-i18n]").forEach((element) => {
+        const key = element.dataset.i18n;
+        if (text[key]) element.textContent = text[key];
+      });
+
+      document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+        const key = element.dataset.i18nAriaLabel;
+        if (text[key]) element.setAttribute("aria-label", text[key]);
+      });
+
+      document.getElementById("languageSelect").value = selectedLanguage;
+
+      const panel = document.getElementById("internalTransferPanel");
+      const toggleButton = document.getElementById("transferToggleButton");
+
+      toggleButton.textContent = panel.hidden
+        ? text.openInternalTransfer
+        : text.closeInternalTransfer;
+    }
+
+    function getAccountName(accountId) {
+      const language = translations[document.documentElement.lang]
+        ? document.documentElement.lang
+        : "fr";
+
+      return accountNames[accountId][language];
+    }
+
+    function showTransferMessage(message, type) {
+      const messageElement = document.getElementById("transferMessage");
+      messageElement.textContent = message;
+      messageElement.className = "transfer-message " + type;
+    }
+
+    function makeInternalTransfer(event) {
+      event.preventDefault();
+
+      const source = document.getElementById("transferSource").value;
+      const destination = document.getElementById("transferDestination").value;
+      const amountInput = document.getElementById("transferAmount");
+      const amount = Math.round(Number(amountInput.value) * 100);
+      const language = document.documentElement.lang === "en" ? "en" : "fr";
+      const text = translations[language];
+
+      if (source === destination) {
+        showTransferMessage(text.transferSameAccount, "error");
+        return;
+      }
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showTransferMessage(text.transferInvalidAmount, "error");
+        return;
+      }
+
+      if (amount > balances[source]) {
+        showTransferMessage(text.transferInsufficientFunds, "error");
+        return;
+      }
+
+      balances[source] -= amount;
+      balances[destination] += amount;
+
+      updateBalances();
+
+      const message = text.transferSuccess
+        .replace("{amount}", formatMoney(amount))
+        .replace("{source}", getAccountName(source))
+        .replace("{destination}", getAccountName(destination));
+
+      showTransferMessage(message, "success");
+      amountInput.value = "";
+    }
+
+    function applySavedTheme() {
+      const savedTheme = localStorage.getItem("devolut-theme");
+      document.body.classList.toggle("dark", savedTheme === "dark");
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+
+      const theme = document.body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("devolut-theme", theme);
+    }
+
+    function applySavedLanguage() {
+      const language = localStorage.getItem("devolut-language") || "fr";
+      applyLanguage(language);
+    }
+
+    applySavedTheme();
+    applySavedLanguage();
+    updateBalances();
+  </script>
+</body>
+</html>
